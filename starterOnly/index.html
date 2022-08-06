@@ -67,7 +67,6 @@
                   id="first"
                   name="first"
                   minlength="2"
-                  required
                 /><br />
               </div>
               <div class="formData">
@@ -78,7 +77,6 @@
                   id="last"
                   name="last"
                   minlength="2"
-                  required
                 /><br />
               </div>
               <div class="formData">
@@ -88,7 +86,6 @@
                   type="email"
                   id="email"
                   name="email"
-                  required
                 /><br />
               </div>
               <div class="formData">
@@ -98,7 +95,6 @@
                   type="date"
                   id="birthdate"
                   name="birthdate"
-                  required
                 /><br />
               </div>
               <div class="formData">
@@ -113,7 +109,6 @@
                   name="quantity"
                   min="0"
                   max="99"
-                  required
                 />
               </div>
               <div class="formData">
@@ -126,7 +121,6 @@
                   id="location1"
                   name="location"
                   value="New York"
-                  required
                 />
                 <label class="checkbox-label" for="location1">
                   <span class="checkbox-icon"></span>
@@ -193,15 +187,20 @@
                   class="checkbox-input"
                   type="checkbox"
                   id="checkbox1"
+                  name="terms"
                   checked
-                  required
                 />
                 <label class="checkbox2-label" for="checkbox1">
                   <span class="checkbox-icon"></span>
                   J'ai lu et accepté les conditions d'utilisation.
                 </label>
                 <br />
-                <input class="checkbox-input" type="checkbox" id="checkbox2" />
+                <input
+                  class="checkbox-input"
+                  type="checkbox"
+                  id="checkbox2"
+                  name="newsletter"
+                />
                 <label class="checkbox2-label" for="checkbox2">
                   <span class="checkbox-icon"></span>
                   Je souhaite être prévenu des prochains évènements.
