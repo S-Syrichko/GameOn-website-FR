@@ -94,12 +94,18 @@ function isFormValid() {
   checkForm();
   if (inputs.some((input) => input.valid === false)) {
     disableSubmit(true);
-    //Launch change event to dynamically check fields
-    formData.forEach((form) => form.addEventListener("change", isFormValid));
   } else {
     disableSubmit(false);
   }
 }
+
+inputs.forEach((input) => {
+  if(input.regExp) {
+    input.element.addEventListener("focusout", (e) => checkTextFields(input));
+  } else {
+    input.element[0].addEventListener("change", (e) => checkRadio(input));
+  }
+})
 
 //Check all form fields
 function checkForm() {
