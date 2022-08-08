@@ -10,7 +10,8 @@ function editNav() {
 // DOM Elements
 const modalbg = document.querySelector(".bground");
 const modalBtn = document.querySelectorAll(".modal-btn");
-const closeBtn = document.querySelectorAll(".close");
+const modalBody = document.querySelector(".modal-body");
+const closeBtn = document.querySelector(".close");
 const submitBtn = document.querySelector("#btn-submit");
 //form fields
 const formData = document.querySelectorAll(".formData");
@@ -73,9 +74,25 @@ let inputs = [
 // launch modal event
 modalBtn.forEach((btn) => btn.addEventListener("click", launchModal));
 // close modal event
-closeBtn.forEach((btn) => btn.addEventListener("click", closeModal));
+closeBtn.addEventListener("click", closeModal);
 // submit modal event
 submitBtn.addEventListener("click", isFormValid);
+// listen form inputs
+inputs.forEach((input) => {
+  if (input.regExp) {
+    input.element.addEventListener("focusout", (e) => checkTextFields(input));
+  } else {
+    input.element[0].addEventListener("change", (e) => checkRadio(input));
+  }
+});
+// dynamically check if form valid
+formData.forEach((field) =>
+  field.addEventListener("change", (e) => {
+    if (inputs.every((input) => input.valid === true)) {
+      enableSubmit();
+    }
+  })
+);
 
 //Functions
 
@@ -92,20 +109,12 @@ function closeModal() {
 //Handle form validation
 function isFormValid() {
   checkForm();
-  if (inputs.some((input) => input.valid === false)) {
-    disableSubmit(true);
+  if (inputs.every((input) => input.valid === true)) {
+    enableSubmit();
   } else {
-    disableSubmit(false);
+    disableSubmit();
   }
 }
-
-inputs.forEach((input) => {
-  if(input.regExp) {
-    input.element.addEventListener("focusout", (e) => checkTextFields(input));
-  } else {
-    input.element[0].addEventListener("change", (e) => checkRadio(input));
-  }
-})
 
 //Check all form fields
 function checkForm() {
@@ -138,33 +147,86 @@ function checkRadio(input) {
   validateInput(isValid, input);
 }
 
-//Handle validation && error messages
+//Set validation state
 function validateInput(isValid, input) {
-  //Get element and existing errorMsg
-  let inputElement = input.element.length ? input.element[0] : input.element;
-  let errors = inputElement.parentNode.getElementsByClassName("errorMsg");
   //Setting validation state
   input.valid = isValid;
   //Add/delete errorMsg
   if (isValid) {
-    //Remove errorMsg if exists
-    errors.length > 0 && errors[0].parentNode.removeChild(errors[0]);
+    removeErrorMsg(input);
   } else {
-    //Add errorMsg if none present
-    if (errors.length == 0) {
-      const errorMsg = document.createElement("p");
-      errorMsg.classList.add("errorMsg");
-      errorMsg.innerHTML = input.errorMsg;
-      inputElement.parentNode.appendChild(errorMsg);
-    }
+    addErrorMsg(input);
   }
 }
-
-//Disable modal submit
-function disableSubmit(disabled) {
-  if (disabled) {
-    submitBtn.setAttribute("disabled", true);
-  } else {
-    submitBtn.removeAttribute("disabled");
+//Add error message
+function addErrorMsg(input) {
+  //Get element and existing errorMsg
+  let inputElement = input.element.length ? input.element[0] : input.element;
+  let errors = inputElement.parentNode.getElementsByClassName("errorMsg");
+  //Add errorMsg if none present
+  if (errors.length == 0) {
+    const errorMsg = document.createElement("p");
+    errorMsg.classList.add("errorMsg");
+    errorMsg.innerHTML = input.errorMsg;
+    errorMsg.style.fontSize = "0.6em";
+    errorMsg.style.color = "red";
+    inputElement.parentNode.appendChild(errorMsg);
+    inputElement.style.borderColor = "red";
   }
+}
+//Remove error message
+function removeErrorMsg(input) {
+  //Get element and existing errorMsg
+  let inputElement = input.element.length ? input.element[0] : input.element;
+  let errors = inputElement.parentNode.getElementsByClassName("errorMsg");
+  //Remove errorMsg if exists
+  if (errors.length > 0) {
+    errors[0].parentNode.removeChild(errors[0]);
+    inputElement.style.borderColor = "";
+  }
+}
+//Disable modal submit button
+function disableSubmit() {
+  submitBtn.setAttribute("disabled", true);
+  submitBtn.style.opacity = "0.5";
+  submitBtn.style.cursor = "not-allowed";
+}
+//Enable modal submit button
+function enableSubmit() {
+  submitBtn.removeAttribute("disabled");
+  submitBtn.style.opacity = "1";
+  submitBtn.style.cursor = "pointer";
+}
+function submitForm(e) {
+  e.preventDefault();
+  transformModal();
+  addSubmitMessage();
+  transformSubmitButton();
+}
+
+
+function transformModal () {
+  formData.forEach((formField) => (formField.parentNode.removeChild(formField)));
+  modalBody.style.height = "600px";
+  modalBody.style.display = "flex";
+  modalBody.style.flexDirection = "column";
+  modalBody.style.alignItems = "center";
+  modalBody.style.justifyContent = "flex-end";
+}
+
+function addSubmitMessage () {
+  const validMsg = document.createElement("p");
+  validMsg.classList.add("validMsg");
+  validMsg.innerHTML = "Merci pour votre inscription";
+  validMsg.style.fontSize = "1.5em";
+  validMsg.style.textAlign = "center";
+  validMsg.style.paddingBottom = "250px";
+  modalBody.prepend(validMsg);
+}
+
+function transformSubmitButton() {
+  submitBtn.value = "Fermer";
+  submitBtn.type = "button";
+  submitBtn.removeEventListener("click", isFormValid);
+  submitBtn.addEventListener("click", closeModal);
 }
