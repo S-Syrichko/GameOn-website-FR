@@ -46,9 +46,8 @@ let inputs = [
   },
   {
     element: birthDate,
-    regExp:
-      /(19\d\d|20([01]\d|2[0-2]))[-](0\d|1[0-2])[-](0[1-9]|[12]\d|3[01])?/,
-    errorMsg: "Veuillez renseigner votre date de naissance",
+    regExp: /(19\d\d|20([01]\d|20))[-](0\d|1[0-2])[-](0[1-9]|[12]\d|3[01])?/,
+    errorMsg: "Veuillez renseigner votre date de naissance (2 ans minimum)",
     valid: false,
   },
   {
@@ -82,7 +81,10 @@ inputs.forEach((input) => {
   if (input.regExp) {
     input.element.addEventListener("focusout", (e) => checkTextFields(input));
   } else {
-    input.element[0].addEventListener("change", (e) => checkRadio(input));
+    // !!!
+    input.element.forEach((elem) =>
+      elem.addEventListener("change", (e) => checkRadio(input))
+    );
   }
 });
 // dynamically check if form valid
@@ -152,11 +154,10 @@ function validateInput(isValid, input) {
   //Setting validation state
   input.valid = isValid;
   //Add/delete errorMsg
-  if (isValid) {
-    removeErrorMsg(input);
-  } else {
-    addErrorMsg(input);
+  if (!isValid) {
+    return addErrorMsg(input);
   }
+  return removeErrorMsg(input);
 }
 //Add error message
 function addErrorMsg(input) {
@@ -164,7 +165,7 @@ function addErrorMsg(input) {
   let inputElement = input.element.length ? input.element[0] : input.element;
   let errors = inputElement.parentNode.getElementsByClassName("errorMsg");
   //Add errorMsg if none present
-  if (errors.length == 0) {
+  if (!errors.length) {
     const errorMsg = document.createElement("p");
     errorMsg.classList.add("errorMsg");
     errorMsg.innerHTML = input.errorMsg;
@@ -197,33 +198,33 @@ function enableSubmit() {
   submitBtn.style.opacity = "1";
   submitBtn.style.cursor = "pointer";
 }
+//Handle fomr submit
 function submitForm(e) {
   e.preventDefault();
   transformModal();
   addSubmitMessage();
   transformSubmitButton();
 }
-
-
-function transformModal () {
-  formData.forEach((formField) => (formField.parentNode.removeChild(formField)));
-  modalBody.style.height = "600px";
+//Transform modal after submit
+function transformModal() {
+  formData.forEach((formField) => formField.parentNode.removeChild(formField));
+  modalBody.style.height = "800px";
   modalBody.style.display = "flex";
   modalBody.style.flexDirection = "column";
   modalBody.style.alignItems = "center";
   modalBody.style.justifyContent = "flex-end";
 }
-
-function addSubmitMessage () {
+//Add submit message
+function addSubmitMessage() {
   const validMsg = document.createElement("p");
   validMsg.classList.add("validMsg");
   validMsg.innerHTML = "Merci pour votre inscription";
   validMsg.style.fontSize = "1.5em";
   validMsg.style.textAlign = "center";
-  validMsg.style.paddingBottom = "250px";
+  validMsg.style.paddingBottom = "300px";
   modalBody.prepend(validMsg);
 }
-
+//Transform submit btn behavior
 function transformSubmitButton() {
   submitBtn.value = "Fermer";
   submitBtn.type = "button";
